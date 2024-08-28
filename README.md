@@ -41,6 +41,9 @@ Create a conda environment with the following command:
 # install dgl (https://www.dgl.ai/pages/start.html)
 >  pip install dgl==1.1.3+cu116 -f https://data.dgl.ai/wheels/cu116/dgl-1.1.3%2Bcu116-cp38-cp38-manylinux1_x86_64.whl
 
+# install pyICU (this avoids problems when using natsort)
+> conda install conda-forge::pyicu
+
 # install flash attention (https://github.com/Dao-AILab/flash-attention#installation-and-features)
 > pip install packaging
 > pip install ninja
