@@ -1,9 +1,32 @@
-exp=3d_diffuser_actor
+#!/bin/bash
+#SBATCH --job-name=evaluate_data
+#SBATCH --nodes 1
+#SBATCH --ntasks-per-node 1
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=10
+#SBATCH --qos=qos_gpu-t3
+#SBATCH -C v100-32g
+#SBATCH --hint=nomultithread
+#SBATCH --time=02:00:00
+#SBATCH --output=/lustre/fswork/projects/rech/pvn/uqn73qm/logs/%j.out
+#SBATCH --error=/lustre/fswork/projects/rech/pvn/uqn73qm/logs/%j.out
+#SBATCH --array=0-17
 
-tasks=(
-    # close_jar_peract insert_onto_square_peg_peract light_bulb_in_peract meat_off_grill_peract open_drawer_peract place_shape_in_shape_sorter_peract place_wine_at_rack_location_peract push_buttons_peract put_groceries_in_cupboard_peract put_item_in_drawer_peract put_money_in_safe_peract reach_and_drag_peract slide_block_to_color_target_peract stack_blocks_peract stack_cups_peract sweep_to_dustpan_of_size_peract turn_tap_peract place_cups_peract
-    put_groceries_in_cupboard_peract
-)
+code_dir=$WORK/Code/3d_diffuser_actor/
+task_file=${task_file:-$code_dir/assets/'peract_tasks.csv'}
+
+task=${task:-put_groceries_in_cupboard_peract}
+task_offset=${task_offset:-1}
+
+
+if [ ! -z $SLURM_ARRAY_TASK_ID ]; then
+  num_tasks=$(wc -l < $task_file)
+  task_id=$(( (${SLURM_ARRAY_TASK_ID} % $num_tasks) + $task_offset ))
+  task=$(sed -n "${task_id},${task_id}p" $task_file)
+fi
+
+exp=${exp:-3d_diffuser_actor}
+
 data_dir=$DATASET/peract_polarnet/microsteps/test/
 num_episodes=100
 gripper_loc_bounds_file=tasks/18_peract_tasks_location_bounds.json
@@ -35,12 +58,10 @@ export SINGULARITYENV_QT_QPA_PLATFORM_PLUGIN_PATH=$WORK/LocalCode/CoppeliaSim_Ed
 
 export SINGULARITYENV_PYTHONPATH=$PYTHONPATH:$WORK/Code/3d_diffuser_actor/:/lustre/fswork/projects/rech/pvn/uqn73qm/RVTRLBench:/lustre/fsn1/projects/rech/pvn/uqn73qm/3d_diffuser_actor/lib 
 
-
-num_ckpts=${#tasks[@]}
-for ((i=0; i<$num_ckpts; i++)); do
-    singularity exec --bind $WORK:$WORK,$SCRATCH:$SCRATCH,$NEWSCRATCH:$NEWSCRATCH,$HOME:$HOME,/gpfswork/rech/pvn/uqn73qm/:/gpfswork/rech/pvn/uqn73qm/ --nv $SINGULARITY_ALLOWED_DIR/nvcuda_v2.sif \
+pushd $code_dir/
+singularity exec --bind $WORK:$WORK,$SCRATCH:$SCRATCH,$NEWSCRATCH:$NEWSCRATCH,$HOME:$HOME,/gpfswork/rech/pvn/uqn73qm/:/gpfswork/rech/pvn/uqn73qm/ --nv $SINGULARITY_ALLOWED_DIR/nvcuda_v2.sif \
     xvfb-run -a $PYTHONBIN online_evaluation_rlbench/evaluate_policy.py \
-    --tasks ${tasks[$i]} \
+    --tasks $task \
     --checkpoint $checkpoint \
     --diffusion_timesteps 100 \
     --fps_subsampling_factor $fps_subsampling_factor \
@@ -58,7 +79,7 @@ for ((i=0; i<$num_ckpts; i++)); do
     --single_task_gripper_loc_bounds $single_task_gripper_loc_bounds \
     --data_dir $data_dir \
     --num_episodes $num_episodes \
-    --output_file $WORK/eval_logs/$exp/seed$seed/${tasks[$i]}.json  \
+    --output_file $WORK/eval_logs/$exp/seed$seed/${task}.json  \
     --use_instruction $use_instruction \
     --instructions $WORK/instructions/peract_new/instructions.pkl \
     --variations {0..60} \
@@ -70,5 +91,3 @@ for ((i=0; i<$num_ckpts; i++)); do
     --quaternion_format $quaternion_format \
     --interpolation_length $interpolation_length \
     --dense_interpolation 1
-done
-

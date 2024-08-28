@@ -1,4 +1,5 @@
 """Online evaluation script on RLBench."""
+import pyrep
 import random
 from typing import Tuple, Optional
 from pathlib import Path
@@ -24,7 +25,7 @@ class Arguments(tap.Tap):
     seed: int = 2
     device: str = "cuda"
     num_episodes: int = 1
-    headless: int = 0
+    headless: int = 1
     max_tries: int = 10
     tasks: Optional[Tuple[str, ...]] = None
     instructions: Optional[Path] = "instructions.pkl"
@@ -103,7 +104,7 @@ def load_models(args):
             nhist=args.num_history,
             relative=bool(args.relative_action),
             lang_enhanced=bool(args.lang_enhanced),
-        )
+        ).to(device)
     elif args.test_model == "act3d":
         model = Act3D(
             backbone=args.backbone,
@@ -161,13 +162,14 @@ if __name__ == "__main__":
     # Load models
     model = load_models(args)
 
+    # import pudb; pudb.set_trace()
     # Load RLBench environment
     env = RLBenchEnv(
         data_path=args.data_dir,
         image_size=[int(x) for x in args.image_size.split(",")],
         apply_rgb=True,
         apply_pc=True,
-        headless=bool(args.headless),
+        headless=True,
         apply_cameras=args.cameras,
         collision_checking=bool(args.collision_checking)
     )

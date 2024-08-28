@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torchvision.ops import FeaturePyramidNetwork
 
 from .multihead_custom_attention import MultiheadCustomAttention
-from .multihead_flash_attention import MultiheadFlashAttention
+# from .multihead_flash_attention import MultiheadFlashAttention
 
 
 def convert_multihead_flash_attention(module, process_group=None):
@@ -172,7 +172,8 @@ def convert_weights(model: nn.Module):
             if l.bias is not None:
                 l.bias.data = l.bias.data.half()
 
-        if isinstance(l, (nn.MultiheadAttention, MultiheadCustomAttention, MultiheadFlashAttention)):
+        # if isinstance(l, (nn.MultiheadAttention, MultiheadCustomAttention, MultiheadFlashAttention)):
+        if isinstance(l, (nn.MultiheadAttention, MultiheadCustomAttention)):
             for attr in [*[f"{s}_proj_weight" for s in ["in", "q", "k", "v"]], "in_proj_bias", "bias_k", "bias_v"]:
                 tensor = getattr(l, attr)
                 if tensor is not None:

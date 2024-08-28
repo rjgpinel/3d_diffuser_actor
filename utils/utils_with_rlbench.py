@@ -27,22 +27,22 @@ from pyrep.const import RenderMode
 
 ALL_RLBENCH_TASKS = [
     'basketball_in_hoop', 'beat_the_buzz', 'change_channel', 'change_clock', 'close_box',
-    'close_door', 'close_drawer', 'close_fridge', 'close_grill', 'close_jar', 'close_laptop_lid',
-    'close_microwave', 'hang_frame_on_hanger', 'insert_onto_square_peg', 'insert_usb_in_computer',
-    'lamp_off', 'lamp_on', 'lift_numbered_block', 'light_bulb_in', 'meat_off_grill', 'meat_on_grill',
-    'move_hanger', 'open_box', 'open_door', 'open_drawer', 'open_fridge', 'open_grill',
+    'close_door', 'close_drawer', 'close_fridge', 'close_grill', 'close_jar_peract', 'close_laptop_lid',
+    'close_microwave', 'hang_frame_on_hanger', 'insert_onto_square_peg_peract', 'insert_usb_in_computer',
+    'lamp_off', 'lamp_on', 'lift_numbered_block', 'light_bulb_in_peract', 'meat_off_grill_peract', 'meat_on_grill',
+    'move_hanger', 'open_box', 'open_door', 'open_drawer_peract', 'open_fridge', 'open_grill',
     'open_microwave', 'open_oven', 'open_window', 'open_wine_bottle', 'phone_on_base',
-    'pick_and_lift', 'pick_and_lift_small', 'pick_up_cup', 'place_cups', 'place_hanger_on_rack',
-    'place_shape_in_shape_sorter', 'place_wine_at_rack_location', 'play_jenga',
-    'plug_charger_in_power_supply', 'press_switch', 'push_button', 'push_buttons', 'put_books_on_bookshelf',
-    'put_groceries_in_cupboard', 'put_item_in_drawer', 'put_knife_on_chopping_board', 'put_money_in_safe',
-    'put_rubbish_in_bin', 'put_umbrella_in_umbrella_stand', 'reach_and_drag', 'reach_target',
-    'scoop_with_spatula', 'screw_nail', 'setup_checkers', 'slide_block_to_color_target',
-    'slide_block_to_target', 'slide_cabinet_open_and_place_cups', 'stack_blocks', 'stack_cups',
-    'stack_wine', 'straighten_rope', 'sweep_to_dustpan', 'sweep_to_dustpan_of_size', 'take_frame_off_hanger',
+    'pick_and_lift', 'pick_and_lift_small', 'pick_up_cup', 'place_cups_peract', 'place_hanger_on_rack',
+    'place_shape_in_shape_sorter_peract', 'place_wine_at_rack_location_peract', 'play_jenga',
+    'plug_charger_in_power_supply', 'press_switch', 'push_button', 'push_buttons_peract', 'put_books_on_bookshelf',
+    'put_groceries_in_cupboard_peract', 'put_item_in_drawer_peract', 'put_knife_on_chopping_board', 'put_money_in_safe_peract',
+    'put_rubbish_in_bin', 'put_umbrella_in_umbrella_stand', 'reach_and_drag_peract', 'reach_target',
+    'scoop_with_spatula', 'screw_nail', 'setup_checkers', 'slide_block_to_color_target_peract',
+    'slide_block_to_target', 'slide_cabinet_open_and_place_cups', 'stack_blocks_peract', 'stack_cups_peract',
+    'stack_wine', 'straighten_rope', 'sweep_to_dustpan', 'sweep_to_dustpan_of_size_peract', 'take_frame_off_hanger',
     'take_lid_off_saucepan', 'take_money_out_safe', 'take_plate_off_colored_dish_rack', 'take_shoes_out_of_box',
     'take_toilet_roll_off_stand', 'take_umbrella_out_of_umbrella_stand', 'take_usb_out_of_computer',
-    'toilet_seat_down', 'toilet_seat_up', 'tower3', 'turn_oven_on', 'turn_tap', 'tv_on', 'unplug_charger',
+    'toilet_seat_down', 'toilet_seat_up', 'tower3', 'turn_oven_on', 'turn_tap_peract', 'tv_on', 'unplug_charger',
     'water_plants', 'wipe_desk'
 ]
 TASK_TO_ID = {task: i for i, task in enumerate(ALL_RLBENCH_TASKS)}
@@ -405,7 +405,8 @@ class RLBenchEnv:
             variation_number=variation,
             amount=1,
             from_episode_number=episode_index,
-            random_selection=False
+            random_selection=False,
+            load_images=False,
         )
         return demos
 
